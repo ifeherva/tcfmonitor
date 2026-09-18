@@ -1,0 +1,11 @@
+{
+  "monitors": [
+    {
+      "id": "alliance-francaise-vancouver-tcf-canada",
+      "name": "Alliance Francaise Vancouver - TCF Canada",
+      "url": "https://www.alliancefrancaise.ca/en/language/exams/tcf-canada/?s8-datatable1_rows=75",
+      "parser": "oncord_exam_table"
+    }
+  ]
+}
+
