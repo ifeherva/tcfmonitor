@@ -1,8 +1,6 @@
 name: Monitor TCF exam availability
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
       send_test_email:

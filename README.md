@@ -35,19 +35,10 @@ attempt to reserve or purchase an exam.
 
 4. Open **Actions → Monitor TCF exam availability → Run workflow**, select
    **Send a test email before checking the exam page**, and run it. Confirm that
-   the workflow succeeds and every configured recipient receives the test. The
-   scheduled workflow then runs every five minutes without sending test messages.
-
-GitHub schedules are best-effort and can run a few minutes late, especially near
-the start of an hour. GitHub may disable schedules in a public repository after
-60 days without repository activity; re-enable the workflow if that happens.
-
-> **Actions cost:** a five-minute schedule starts about 8,640 jobs in a 30-day
-> month. GitHub rounds each private-repository job up to a full billable minute,
-> so this can exceed the included monthly allowance even though each check is
-> short. Standard runners are free for public repositories. Review
-> [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
-> before enabling the schedule in a private repository.
+   the workflow succeeds and every configured recipient receives the test.
+5. Configure the external scheduler to invoke this workflow's `workflow_dispatch`
+   endpoint every five minutes. GitHub's native scheduler is intentionally not
+   enabled; manual runs remain available from the Actions page.
 
 ## How change detection works
 
