@@ -82,24 +82,39 @@ def parse_oncord_exam_table(page_html: str, page_url: str) -> list[Session]:
         spots = normalized_text(cells[4])
         price = normalized_text(cells[5])
         status_node = row.select_one(".es-status")
-        status = normalized_text(status_node)
-        if not status:
+        held_node = row.select_one(".es-held-card")
+
+        if status_node is not None:
+            status = normalized_text(status_node)
+            if not status:
+                raise ValueError(
+                    f"exam row {row_number} contained an empty booking status"
+                )
+            status_classes = set(status_node.get("class", []))
+            status_lower = status.casefold()
+            is_open = "es-status-available" in status_classes or status_lower in {
+                "available",
+                "book now",
+                "open",
+                "register",
+                "register now",
+            }
+            booking_link = status_node.find("a", href=True)
+            booking_url = (
+                urljoin(page_url, str(booking_link["href"]))
+                if booking_link
+                else page_url
+            )
+        elif held_node is not None:
+            # The site temporarily replaces the normal status element while one
+            # or more seats are reserved in another visitor's checkout session.
+            # A held seat is not bookable, but its release should later produce
+            # the normal unavailable -> available transition and an alert.
+            status = "Spots held"
+            is_open = False
+            booking_url = page_url
+        else:
             raise ValueError(f"exam row {row_number} did not contain a booking status")
-
-        status_classes = set(status_node.get("class", [])) if status_node else set()
-        status_lower = status.casefold()
-        is_open = "es-status-available" in status_classes or status_lower in {
-            "available",
-            "book now",
-            "open",
-            "register",
-            "register now",
-        }
-
-        booking_link = status_node.find("a", href=True) if status_node else None
-        booking_url = (
-            urljoin(page_url, str(booking_link["href"])) if booking_link else page_url
-        )
 
         sessions.append(
             Session(

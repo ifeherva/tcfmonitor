@@ -35,6 +35,18 @@ class ParserTests(unittest.TestCase):
             "https://www.alliancefrancaise.ca/commerce/book/123",
         )
 
+    def test_parses_temporarily_held_session_as_unavailable(self):
+        session = self.parse_fixture("held.html")[0]
+        self.assertEqual(session.status, "Spots held")
+        self.assertFalse(session.is_open)
+        self.assertEqual(session.booking_url, PAGE_URL)
+
+    def test_alerts_when_a_temporarily_held_session_becomes_available(self):
+        held = self.parse_fixture("held.html")[0]
+        available = self.parse_fixture("open.html")[0]
+        previous = {"sessions": {held.key: {"is_open": False}}}
+        self.assertEqual(newly_open_sessions([available], previous), [available])
+
     def test_rejects_page_without_exam_table(self):
         with self.assertRaisesRegex(ValueError, "exam table"):
             parse_oncord_exam_table("<html></html>", PAGE_URL)
